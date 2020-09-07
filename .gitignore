@@ -9,6 +9,9 @@ data/zookeeper/data
 data/zookeeper/datalog
 data/zookeeper/logs
 
+# Custom
+.gitkeep
+
 # Custom by DataGrand kg-model group
 .idea/
 *.DS_Store
