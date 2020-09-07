@@ -1,0 +1,438 @@
+
+GET /_cat/health?v
+GET /_cat/indices?v
+GET _search_shards
+
+# 查看mapping and settings
+GET /index/_mapping?pretty
+GET /index/_settings?pretty
+
+
+# 创建索引：
+PUT /ecommerce?pretty
+
+# 查看索引：
+GET /ecommerce?pretty
+
+# 查看索引mapping字段等设置：
+GET /ecommerce/_mapping?pretty
+
+# 查看索引setting等设置：
+GET /ecommerce/_settings?pretty
+ 
+# 删除索引：
+DELETE /ecommerce？pretty
+
+# 插入文档1
+PUT /ecommerce/product/1
+{
+	"name":"gaolujie yagao",
+	"desc":"guchi meibai",
+	"price":21,
+	"producer": "gaolujie producer",
+	"tags":["guchi", "fangzhu"]
+}
+
+
+# 插入文档2
+PUT ecommerce/product/2
+{
+  "name": "jiejieshi yagao",
+  "desc": "youxiao fangzhu",
+  "price": 25,
+  "producer": "jiajieshi producer",
+  "tags": ["fangzhu"]
+}
+
+# 插入文档3
+PUT /ecommerce/product/3
+{
+	"name":"zhonghua yagao",
+	"desc":"caoben zhiwu",
+	"price": 40,
+	"producer": "zhonghua producer",
+	"tags":["qingxin"]
+}
+
+# 插入文档4
+PUT /ecommerce/product/4
+{
+	"name":"hei mei yagao",
+	"desc":"cao ben zhiwu",
+	"price": 36,
+	"producer": "hei mei producer",
+	"tags":["shachong qingjie"]
+}
+
+# 修改/替换文档：
+PUT /ecommerce/product/1
+{
+ 	"name":"gaolujie yagao",
+	"desc":"gaolujie meibai",
+	"price":22,
+	"tags":["meibai", "fangzhu"] 
+}
+
+# 修改/更新文档：
+POST /ecommerce/product/1/_update
+{
+	"doc":{
+	  "name": "jiaqiangban gaolujie yagao"
+	}
+}
+
+# 查找文档：
+GET /ecommerce/product/1
+
+# 删除文档
+DELETE /ecommerce/product/1
+
+# 检索所有数据
+GET ecommerce/product/_search
+
+# 按条件检索，如：字段名搜索（q=k:v），并按字段值排序（sort=k:desc）
+GET ecommerce/product/_search?q=name:yagao&sort=price:desc
+
+# 按字段搜索并排序
+GET  ecommerce/product/_search?q=name:yagao&from=1&sort=price:desc&size=2
+
+# query dsl
+# 查询所有数据
+GET ecommerce/product/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 0,
+  "size": 2,
+  "sort": [
+    {
+      "price": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+# 利用_source字段，只返回指定字段
+GET /ecommerce/product/_search
+{
+  "query":{
+    "match_all": {}
+  },
+  "_source": ["name","price"]
+}
+
+# 按指定字段值查询
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "gaolujie"
+    }
+  },
+  "size": 20
+}
+
+# 判断字段是否存在
+GET ecommerce/product/_search
+{
+  "query": {
+    "exists":{
+      "field": "price"
+    }
+  }
+}
+
+# 利用from和size分页查询，每页显示一条，显示第二页
+GET /ecommerce/product/_search
+{
+  "query":{
+    "match_all": {}
+  },
+  "from":1, 
+  "size":1
+}
+
+# 利用bool-must/should/must not|filter-match|range过滤，其中range为左闭右闭
+GET ecommerce/product/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "name": "yagao"
+          }
+        }
+      ],
+      "filter": {
+        "range": {
+          "price": {
+            "gte": 20,
+            "lte": 35
+          }
+        }
+      }
+    }
+  }
+}
+
+# full-text search：
+# 根据全文索引，检索句子
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "mei yagao"
+    }
+  }
+}
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "mei, yagao"
+    }
+  }
+}
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "meiyagao"
+    }
+  }
+}
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "mei yagao"
+    }
+  }
+}
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "yagao,mei"
+    }
+  }
+}
+
+# 
+
+# phrase search：
+# 利用query下match_phrase，在指定字段上，检索句子
+GET /ecommerce/product/_search
+{
+  "query": {
+    "match_phrase": {
+      "name": "yagao"
+    }
+  }
+}
+GET /ecommerce/product/_search
+{
+  "query": {
+    "match_phrase": {
+      "name": "gaolujie,yagao"
+    }
+  }
+}
+GET /ecommerce/product/_search
+{
+  "query": {
+    "match_phrase": {
+      "name": "gaolujie yagao"
+    }
+  }
+}
+GET /ecommerce/product/_search
+{
+  "query": {
+    "match_phrase": {
+      "name": "yagao gaolujie"
+    }
+  }
+}
+
+GET ecommerce/product/_search
+{
+  "query": {
+    "match_phrase": {
+      "name": "mei yagao"
+    }
+  }
+}
+
+
+# 利用根下highlight字段，进行高亮提示：
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "yagao"
+    }
+  },
+  "highlight": {
+    "fields": {
+      "name":{}
+    }
+  }
+}
+GET ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "producer": "producer"
+    }
+  },
+  "highlight": {
+    "fields": {
+      "name":{},
+      "producer":{}
+    }
+  }
+}
+
+# 设置text全文索引字段的fielddata的值为true，以支持agg聚合操作
+PUT ecommerce/_mapping/product
+{
+  "properties": {
+    "tags":{
+      "type":"text",
+      "fielddata": true
+    }
+  }
+}
+
+
+# 按每个文档中指定字段数组中的元素进行聚合
+GET /ecommerce/product/_search
+{
+  "aggs": {
+    "group_by_tags": {
+      "terms": {
+        "field": "tags"
+      }
+    }
+  }
+}
+
+# 聚合分析-分组+搜索
+# 设置text全文索引字段的fielddata的值为true，以支持agg聚合操作
+GET /ecommerce/product/_search
+{
+  "query": {
+    "match": {
+      "name": "gaolujie"
+    }
+  }, 
+  "aggs": {
+    "group_by_tags": {
+      "terms": {
+        "field": "tags"
+      }
+    }
+  }
+}
+
+# 聚合分析 - 先分组，再算每组的平均
+# 计算每个tag下的商品的平均价格
+GET ecommerce/product/_search
+{
+  "aggs": {
+    "group_by_tags": {
+      "terms": {
+        "field": "tags"
+      },
+      "aggs": {
+          "avg_price":{
+            "avg": {
+              "field": "price"
+            }
+          }
+        }
+    }
+  }
+}
+
+
+# 聚合分析 - 先分组，再算每组的平均，再降序排序
+GET ecommerce/product/_search
+{
+  "aggs": {
+    "group_by_tags": {
+      "terms": {
+        "field": "tags",
+        "size": 10, 
+        "order": {
+          "avg_price": "desc"
+        }
+      },
+      "aggs": {
+        "avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+GET ecommerce/product/_search
+{
+  "size": 20, 
+  "aggs": {
+    "group_by_price": {
+      "range": {
+        "field": "price",
+        "ranges": [
+          {
+            "from": 0,
+            "to": 20
+          },
+          {
+            "from": 20,
+            "to": 36
+          },
+          {
+            "from": 37,
+            "to": 40
+          }
+        ]
+      },
+      "aggs": {
+        "group_by_aggs": {
+          "terms": {
+            "field": "tags"
+          },
+          "aggs": {
+            "avg_price": {
+              "avg": {
+                "field": "price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+PUT /test_index/test_typ/1
+{
+  "test_content": "test test"
+}
+
+GET test_index/test_typ/_search
+
+
+
+
+
+
