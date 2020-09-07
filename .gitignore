@@ -1,5 +1,13 @@
 # Custom
-
+data/elasticsearch/data/
+data/elasticsearch/logs/
+data/kafka/data/
+data/kafka/logs
+data/mysql/data/
+data/redis/data/
+data/zookeeper/data
+data/zookeeper/datalog
+data/zookeeper/logs
 
 # Custom by DataGrand kg-model group
 .idea/
