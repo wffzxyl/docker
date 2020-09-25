@@ -3,7 +3,7 @@ xnet:
 
 xstack:
 	docker stack rm xstack
-	sleep 3
+	sleep 5
 	docker stack deploy -c docker-compose.yml --prune --with-registry-auth xstack
 
 xprune:
