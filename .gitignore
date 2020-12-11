@@ -8,6 +8,7 @@ data/redis/data/
 data/zookeeper/data
 data/zookeeper/datalog
 data/zookeeper/logs
+data/kafka/config/server.properties
 
 # Custom
 .gitkeep
