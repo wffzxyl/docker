@@ -12,6 +12,8 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - ./data/mysql/data:/var/lib/mysql
+      - ./data/mysql/log:/var/log/mysql
+      - ./data/mysql/backup:/var/lib/mysql-files/
       - ./data/mysql/my.cnf:/etc/mysql/conf.d/mysql.cnf
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -uroot -p${MYSQL_ROOT_PASSWORD} || exit 1"]
