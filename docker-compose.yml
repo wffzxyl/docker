@@ -100,48 +100,37 @@ services:
       - xnet
 
   elasticsearch:
-    image: elasticsearch:5.5-alpine
-    # image: blacktop/elasticsearch:7.5
+    image: elasticsearch-smartcn:7.17.6
     ports:
       - "19200:9200"
       - "19300:9300"
     environment:
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-      # - node.name=elasticsearch
-      # - http.host=0.0.0.0
-      # - cluster.name=docker-cluster
-      # - discovery.zen.minimum_master_nodes=1
-      # - Dlog4j2.disable.jmx=true
-      # - discovery.type=single-node
-      # - bootstrap.memory_lock=true
-      # - bootstrap.system_call_filter=false
-      # - xpack.security.enabled=false
-      # - xpack.monitoring.enabled=true
-      # - xpack.graph.enabled=false
-      #  - xpack.watcher.enabled=false
+      - "node.name=node-1"
+      - "cluster.name=docker-cluster"
+      - "cluster.initial_master_nodes=[“node-1”]"
     volumes:
-      - ./data/elasticsearch/config:/usr/share/elasticsearch/config
+    # - ./data/elasticsearch/config:/usr/share/elasticsearch/config  # lack 7.17.6 jvm.options file
       - ./data/elasticsearch/data:/usr/share/elasticsearch/data
       - ./data/elasticsearch/logs:/usr/share/elasticsearch/logs
-      - ./data/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+    #  - ./data/elasticsearch/plugins:/usr/share/elasticsearch/plugins
     healthcheck:
       test: ["CMD-SHELL", "echo -ne 'GET / HTTP/1.0\r\n\r\n' | nc localhost 9200 | head -1"]
       interval: 30s
       timeout: 5s
       retries: 3
     networks:
-      - xnet
+      - net
 
   kibana:
-    image: kibana:5.5
+    image: docker.elastic.co/kibana/kibana:7.17.6
     ports:
       - "15601:5601"
     volumes:
-      - ./data/kibana/config/kibana.yml:/etc/kibana/kibana.yml
+      - ./data/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
     networks:
-      - xnet
+      - net
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
