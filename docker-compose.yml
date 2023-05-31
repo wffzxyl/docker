@@ -187,6 +187,52 @@ services:
     networks:
       - xnet
 
+#  elasticsearch:
+#    image: elasticsearch-smartcn:7.17.6
+#    ports:
+#      - "19200:9200"
+#      - "19300:9300"
+#    environment:
+#      - "node.name=node-1"
+#      - "cluster.name=docker-cluster"
+#      - "cluster.initial_master_nodes=[“node-1”]"
+#    volumes:
+#    # - ./data/elasticsearch/config:/usr/share/elasticsearch/config  # lack 7.17.6 jvm.options file
+#      - ./data/elasticsearch/data:/usr/share/elasticsearch/data
+#      - ./data/elasticsearch/logs:/usr/share/elasticsearch/logs
+#    #  - ./data/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+#    healthcheck:
+#      test: ["CMD-SHELL", "echo -ne 'GET / HTTP/1.0\r\n\r\n' | nc localhost 9200 | head -1"]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 3
+#    networks:
+#      - net
+#
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.17.6
+#    ports:
+#      - "14041:5601"
+#    volumes:
+#      - ./data/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+#    depends_on:
+#      - elasticsearch
+#    networks:
+#      - net
+
+  milvus:
+    image: milvusdb/milvus:1.1.1-cpu-d061621-330cc6
+    ports:
+      - "29530:19530"
+      - "29121:19121"
+    volumes:
+      - ./data/milvus/db:/var/lib/milvus/db
+      - ./data/milvus/conf:/var/lib/milvus/conf
+      - ./data/milvus/logs:/var/lib/mivus/logs
+      - ./data/milvus/wal:/var/lib/mivus/wal
+    networks:
+      - xnet
+      
 networks:
   xnet:
     external: true
